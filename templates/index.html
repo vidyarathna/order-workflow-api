@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Workflow API Tester</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Order Workflow API Tester</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Create Order -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Create Order</h2>
+                <div class="space-y-3">
+                    <input type="number" id="createProductId" placeholder="Product ID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="number" id="createQuantity" placeholder="Quantity" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="number" step="0.01" id="createPrice" placeholder="Price" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="createOrderBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">Create Order</button>
+                </div>
+                <div id="createResponse" class="mt-4 p-3 bg-gray-50 rounded-md text-sm font-mono whitespace-pre-wrap"></div>
+            </div>
+
+            <!-- List Orders -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">List Orders</h2>
+                <div class="space-y-3">
+                    <input type="number" id="listLimit" placeholder="Limit (1-100)" value="10" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="number" id="listOffset" placeholder="Offset" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="listOrdersBtn" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">List Orders</button>
+                </div>
+                <div id="listResponse" class="mt-4 p-3 bg-gray-50 rounded-md text-sm font-mono whitespace-pre-wrap"></div>
+            </div>
+
+            <!-- Fetch Order -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Fetch Order</h2>
+                <div class="space-y-3">
+                    <input type="number" id="fetchOrderId" placeholder="Order ID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="fetchOrderBtn" class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">Fetch Order</button>
+                </div>
+                <div id="fetchResponse" class="mt-4 p-3 bg-gray-50 rounded-md text-sm font-mono whitespace-pre-wrap"></div>
+            </div>
+
+            <!-- Validate Order -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Validate Order</h2>
+                <div class="space-y-3">
+                    <input type="number" id="validateOrderId" placeholder="Order ID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="validateOrderBtn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">Validate Order</button>
+                </div>
+                <div id="validateResponse" class="mt-4 p-3 bg-gray-50 rounded-md text-sm font-mono whitespace-pre-wrap"></div>
+            </div>
+
+            <!-- Approve Order -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Approve Order</h2>
+                <div class="space-y-3">
+                    <input type="number" id="approveOrderId" placeholder="Order ID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="approveOrderBtn" class="w-full bg-purple-500 hover:bg-purple-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">Approve Order</button>
+                </div>
+                <div id="approveResponse" class="mt-4 p-3 bg-gray-50 rounded-md text-sm font-mono whitespace-pre-wrap"></div>
+            </div>
+
+            <!-- Reject Order -->
+            <div class="bg-white p-6 rounded-lg shadow-md md:col-span-2">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Reject Order</h2>
+                <div class="space-y-3">
+                    <input type="number" id="rejectOrderId" placeholder="Order ID" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="rejectOrderBtn" class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-md transition duration-200">Reject Order</button>
+                </div>
+                <div id="rejectResponse" class="mt-4 p-3 bg-gray-50 rounded-md text-sm font-mono whitespace-pre-wrap"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        /**
+         * @typedef {Object} Order
+         * @property {number} id
+         * @property {number} product_id
+         * @property {number} quantity
+         * @property {number} price
+         * @property {string} status
+         */
+
+        /**
+         * @typedef {Object} ApiResponse
+         * @property {string} message
+         */
+
+        /**
+         * Generic function to make API calls
+         * @param {string} url
+         * @param {string} method
+         * @param {Object} [body]
+         * @returns {Promise<Object>}
+         */
+        async function apiCall(url, method = 'GET', body = null) {
+            const options = {
+                method,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            };
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            const response = await fetch(url, options);
+            return await response.json();
+        }
+
+        /**
+         * Display response in the specified element
+         * @param {string} elementId
+         * @param {Object} data
+         */
+        function displayResponse(elementId, data) {
+            const element = document.getElementById(elementId);
+            element.textContent = JSON.stringify(data, null, 2);
+        }
+
+        /**
+         * Handle API errors
+         * @param {string} elementId
+         * @param {Error} error
+         */
+        function displayError(elementId, error) {
+            const element = document.getElementById(elementId);
+            element.textContent = `Error: ${error.message}`;
+        }
+
+        // Create Order
+        document.getElementById('createOrderBtn').addEventListener('click', async () => {
+            const productId = document.getElementById('createProductId').value;
+            const quantity = document.getElementById('createQuantity').value;
+            const price = document.getElementById('createPrice').value;
+
+            if (!productId || !quantity || !price) {
+                displayResponse('createResponse', { error: 'Please fill all fields' });
+                return;
+            }
+
+            try {
+                const data = await apiCall('/orders', 'POST', {
+                    product_id: parseInt(productId),
+                    quantity: parseInt(quantity),
+                    price: parseFloat(price)
+                });
+                displayResponse('createResponse', data);
+            } catch (error) {
+                displayError('createResponse', error);
+            }
+        });
+
+        // Fetch Order
+        document.getElementById('fetchOrderBtn').addEventListener('click', async () => {
+            const orderId = document.getElementById('fetchOrderId').value;
+            if (!orderId) {
+                displayResponse('fetchResponse', { error: 'Please enter Order ID' });
+                return;
+            }
+
+            try {
+                const data = await apiCall(`/orders/${orderId}`);
+                displayResponse('fetchResponse', data);
+            } catch (error) {
+                displayError('fetchResponse', error);
+            }
+        });
+
+        // List Orders
+        document.getElementById('listOrdersBtn').addEventListener('click', async () => {
+            const limit = document.getElementById('listLimit').value;
+            const offset = document.getElementById('listOffset').value;
+
+            try {
+                const url = `/orders?limit=${limit}&offset=${offset}`;
+                const data = await apiCall(url);
+                displayResponse('listResponse', data);
+            } catch (error) {
+                displayError('listResponse', error);
+            }
+        });
+
+        // Validate Order
+        document.getElementById('validateOrderBtn').addEventListener('click', async () => {
+            const orderId = document.getElementById('validateOrderId').value;
+            if (!orderId) {
+                displayResponse('validateResponse', { error: 'Please enter Order ID' });
+                return;
+            }
+
+            try {
+                const data = await apiCall(`/orders/${orderId}/validate`, 'POST');
+                displayResponse('validateResponse', data);
+            } catch (error) {
+                displayError('validateResponse', error);
+            }
+        });
+
+        // Approve Order
+        document.getElementById('approveOrderBtn').addEventListener('click', async () => {
+            const orderId = document.getElementById('approveOrderId').value;
+            if (!orderId) {
+                displayResponse('approveResponse', { error: 'Please enter Order ID' });
+                return;
+            }
+
+            try {
+                const data = await apiCall(`/orders/${orderId}/approve`, 'POST');
+                displayResponse('approveResponse', data);
+            } catch (error) {
+                displayError('approveResponse', error);
+            }
+        });
+
+        // Reject Order
+        document.getElementById('rejectOrderBtn').addEventListener('click', async () => {
+            const orderId = document.getElementById('rejectOrderId').value;
+            if (!orderId) {
+                displayResponse('rejectResponse', { error: 'Please enter Order ID' });
+                return;
+            }
+
+            try {
+                const data = await apiCall(`/orders/${orderId}/reject`, 'POST');
+                displayResponse('rejectResponse', data);
+            } catch (error) {
+                displayError('rejectResponse', error);
+            }
+        });
+    </script>
+</body>
+</html>
