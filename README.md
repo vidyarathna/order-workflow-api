@@ -132,7 +132,7 @@ Tests cover basic order operations and workflow transitions using an isolated te
 - Database connection pooling
 - Comprehensive logging and monitoring
 
-## Interview Notes
+## Notes
 
 This project demonstrates:
 - Building REST APIs with proper separation of concerns
